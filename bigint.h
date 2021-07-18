@@ -3,7 +3,7 @@
 
 #include <type_traits>
 #include <iostream>
-
+#include <cmath>
 #include "ubigint.h"
 
 class BigInt {
@@ -53,21 +53,17 @@ public:
     BigInt& randomize(const size_t &length);
     BigInt& power(const BigInt &rhs);
     BigInt& shift10(int m=1);
-    BigInt& abs() {neg = false;}
+    BigInt& abs();
     size_t get_length() {return magnitude.get_length();}
-    uint karatsuba_thres = 64;
+    BigInt& set_karatsuba_thres(size_t thres); 
+    size_t get_karatsuba_thres() {return this->karatsuba_thres;}
 private:
     UBigInt magnitude;
     bool neg = false;
+    size_t karatsuba_thres = 48;
     BigInt karatsuba(BigInt lhs, BigInt rhs);
 };
 
-bool test_arithmatic();
-void test_util();
-void find_karatsuba_thres(std::pair<int, int> k_test_limits={16,128},
-                          int k_test_increment=8,
-                          int n_per_increment=1,
-                          size_t size_number=1000);
 
 BigInt::BigInt(std::string s) {
     neg = false;
@@ -305,6 +301,12 @@ bool operator<=(const BigInt &lhs, const BigInt &rhs) {
 }
 
 
+BigInt& BigInt::set_karatsuba_thres(size_t thres) {
+    this->karatsuba_thres = thres;
+    return *this;
+}
+
+
 BigInt BigInt::karatsuba(BigInt lhs, BigInt rhs) {
     if (lhs.get_length() < karatsuba_thres || rhs.get_length() < karatsuba_thres) {
         return lhs.magnitude *= rhs.magnitude;
@@ -362,6 +364,10 @@ BigInt& BigInt::power(const BigInt &rhs) {
     return *this;
 }
 
+BigInt& BigInt::abs() {
+    neg = false;
+    return *this;
+}
 
 BigInt& BigInt::shift10(int m) {
     magnitude.shift10(m);

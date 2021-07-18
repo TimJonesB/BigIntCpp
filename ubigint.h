@@ -5,6 +5,7 @@
 #include <string>
 #include <stack>
 #include <type_traits>
+#include <unordered_map>
 
 class UBigInt {
 public:
