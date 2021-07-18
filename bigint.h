@@ -4,6 +4,7 @@
 #include <type_traits>
 #include <iostream>
 #include <cmath>
+
 #include "ubigint.h"
 
 class BigInt {
@@ -364,14 +365,17 @@ BigInt& BigInt::power(const BigInt &rhs) {
     return *this;
 }
 
+
 BigInt& BigInt::abs() {
     neg = false;
     return *this;
 }
 
+
 BigInt& BigInt::shift10(int m) {
     magnitude.shift10(m);
     return *this;
 }
+
 
 #endif

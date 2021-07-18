@@ -6,6 +6,7 @@
 
 #include "bigint.h"
 
+
 void find_karatsuba_thres(std::pair<int, int> k_test_limits={16,128},
                           int k_test_increment=16,
                           int n_per_increment=5,
@@ -44,7 +45,6 @@ void find_karatsuba_thres(std::pair<int, int> k_test_limits={16,128},
     else {
         std::cout << "Default karatsuba multiplication threshold is optimal" << std::endl;
     }
-
 }
 
 
