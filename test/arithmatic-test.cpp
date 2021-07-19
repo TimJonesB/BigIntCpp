@@ -100,4 +100,3 @@ TEST (arithmatic, division_test) {
     EXPECT_EQ((tz/ta), BigInt("0"));
     EXPECT_EQ((tz/tb), BigInt("0"));
 }
-

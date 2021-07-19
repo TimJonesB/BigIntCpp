@@ -1,4 +1,3 @@
-
 include(FetchContent)
 FetchContent_Declare(
   googletest
@@ -15,7 +14,8 @@ add_executable(BigIntCpp_test
                karatsuba-calibration-test.cpp)
 
 target_include_directories(BigIntCpp_test PUBLIC
-						   ${CMAKE_CURRENT_SOURCE_DIR}/../src)					
+						   ${CMAKE_CURRENT_SOURCE_DIR}/../include)					
+
 target_link_libraries(BigIntCpp_test
 					  gtest_main
 )
