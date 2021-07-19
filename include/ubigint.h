@@ -6,13 +6,36 @@
 #include <stack>
 #include <type_traits>
 #include <unordered_map>
+#include <numeric>
+#include <algorithm>
 
 
 class UBigInt {
 public:
     UBigInt() = default;
     UBigInt(char rhs): num{rhs-'0'} {}
-    UBigInt(std::string rhs);
+    UBigInt(std::string s) {
+        std::unordered_map<char,int> s2num{{'0',0}, {'1',1}, {'2',2},
+                                        {'3',3}, {'4',4}, {'5',5},
+                                        {'6',6}, {'7',7}, {'8',8},{'9',9}};
+        int i = 0;
+        while (s[i] == ' ') {
+            i++;
+        }
+        while (s[i] == '0' || s[i] == '+' || s[i] == '-') {
+            i++;
+        }
+        while (i < s.size()) { 
+            if (s2num.find(s[i]) == s2num.end()) {
+                throw std::runtime_error("Invalid character in string");
+            }
+            num.push_back(s2num[s[i]]);
+            i++;
+        }
+        if (num.empty()) {
+            num = {0};
+        }
+    };
     template <class T,
               typename std::enable_if<std::is_integral<T>::value, int>::type* = nullptr>
     UBigInt(T rhs) {
@@ -40,63 +63,41 @@ public:
     UBigInt& operator=(const UBigInt &rhs) = default;
     UBigInt& operator=(UBigInt &&rhs) = default;
     ~UBigInt() = default;
-    UBigInt& operator+=(const UBigInt &rhs);
-    UBigInt& operator-=(const UBigInt &rhs);
-    UBigInt& operator*=(const UBigInt &rhs);
-    UBigInt& operator/=(const UBigInt &rhs);
-    UBigInt& operator++();
-    UBigInt& operator--();
-    UBigInt operator++(int);
-    UBigInt operator--(int);
-    friend std::ostream& operator<<(std::ostream &out, const UBigInt rhs);
-    friend UBigInt operator+(const UBigInt &lhs, const UBigInt &rhs);
-    friend UBigInt operator-(const UBigInt &lhs, const UBigInt &rhs);
-    friend UBigInt operator*(const UBigInt &lhs, const UBigInt &rhs);
-    friend UBigInt operator/(const UBigInt &lhs, const UBigInt &rhs);
-    friend bool operator<(const UBigInt &lhs, const UBigInt &rhs);
-    friend bool operator>(const UBigInt &lhs, const UBigInt &rhs);
-    friend bool operator==(const UBigInt &lhs, const UBigInt &rhs);
-    friend bool operator<=(const UBigInt &lhs, const UBigInt &rhs);
-    friend bool operator>=(const UBigInt &lhs, const UBigInt &rhs);
-    friend bool operator!=(const UBigInt &lhs, const UBigInt &rhs);
-    UBigInt& power(const UBigInt &rhs);
-    UBigInt& randomize(const size_t &length);
-    UBigInt& shift10(int m=1);
+    inline UBigInt& operator+=(const UBigInt &rhs);
+    inline UBigInt& operator-=(const UBigInt &rhs);
+    inline UBigInt& operator*=(const UBigInt &rhs);
+    inline UBigInt& operator/=(const UBigInt &rhs);
+    inline UBigInt& operator++();
+    inline UBigInt& operator--();
+    inline UBigInt operator++(int);
+    inline UBigInt operator--(int);
+    inline friend std::ostream& operator<<(std::ostream &out, const UBigInt rhs);
+    inline friend UBigInt operator+(const UBigInt &lhs, const UBigInt &rhs);
+    inline friend UBigInt operator-(const UBigInt &lhs, const UBigInt &rhs);
+    inline friend UBigInt operator*(const UBigInt &lhs, const UBigInt &rhs);
+    inline friend UBigInt operator/(const UBigInt &lhs, const UBigInt &rhs);
+    inline friend bool operator<(const UBigInt &lhs, const UBigInt &rhs);
+    inline friend bool operator>(const UBigInt &lhs, const UBigInt &rhs);
+    inline friend bool operator==(const UBigInt &lhs, const UBigInt &rhs);
+    inline friend bool operator<=(const UBigInt &lhs, const UBigInt &rhs);
+    inline friend bool operator>=(const UBigInt &lhs, const UBigInt &rhs);
+    inline friend bool operator!=(const UBigInt &lhs, const UBigInt &rhs);
+    inline UBigInt& power(const UBigInt &rhs);
+    inline UBigInt& randomize(const size_t &length);
+    inline UBigInt& shift10(int m=1);
+    inline UBigInt get_slice(size_t start_index, size_t end_index);
     size_t get_length() {return num.size();}
-    UBigInt get_slice(size_t start_index, size_t end_index);
 
 private:
     std::deque<int> num;
-    UBigInt elementary_mult(const UBigInt &lhs, const UBigInt &rhs);
-    UBigInt divide_primative(const UBigInt &rhs);
-    UBigInt long_division(const UBigInt &rhs);
-};
-
-UBigInt::UBigInt(std::string s) {
-    std::unordered_map<char,int> s2num{{'0',0}, {'1',1}, {'2',2},
-                                       {'3',3}, {'4',4}, {'5',5},
-                                       {'6',6}, {'7',7}, {'8',8},{'9',9}};
-    int i = 0;
-    while (s[i] == ' ') {
-        i++;
-    }
-    while (s[i] == '0' || s[i] == '+' || s[i] == '-') {
-        i++;
-    }
-    while (i < s.size()) { 
-        if (s2num.find(s[i]) == s2num.end()) {
-            throw std::runtime_error("Invalid character in string");
-        }
-        num.push_back(s2num[s[i]]);
-        i++;
-    }
-    if (num.empty()) {
-        num = {0};
-    }
+    inline UBigInt elementary_mult(const UBigInt &lhs, const UBigInt &rhs);
+    inline UBigInt divide_primative(const UBigInt &rhs);
+    inline UBigInt long_division(const UBigInt &rhs);
 };
 
 
-std::ostream& operator<<(std::ostream& out, const UBigInt rhs) {
+
+inline std::ostream& operator<<(std::ostream& out, const UBigInt rhs) {
     for (const auto it : rhs.num) {
         std::cout << it;
     }
@@ -104,12 +105,12 @@ std::ostream& operator<<(std::ostream& out, const UBigInt rhs) {
 }
 
 
-bool operator==(const UBigInt &lhs, const UBigInt &rhs) {
+inline bool operator==(const UBigInt &lhs, const UBigInt &rhs) {
     return lhs.num == rhs.num;
 }
 
 
-bool operator<(const UBigInt &lhs, const UBigInt &rhs) {
+inline bool operator<(const UBigInt &lhs, const UBigInt &rhs) {
     if (lhs.num.size() < rhs.num.size()) {
         return true;
     }
@@ -123,7 +124,7 @@ bool operator<(const UBigInt &lhs, const UBigInt &rhs) {
 }
 
 
-bool operator>(const UBigInt &lhs, const UBigInt &rhs) {
+inline bool operator>(const UBigInt &lhs, const UBigInt &rhs) {
     if (lhs.num.size() > rhs.num.size()) {
         return true;
     }
@@ -137,22 +138,22 @@ bool operator>(const UBigInt &lhs, const UBigInt &rhs) {
 }
 
 
-bool operator<=(const UBigInt &lhs, const UBigInt &rhs) {
+inline bool operator<=(const UBigInt &lhs, const UBigInt &rhs) {
     return (lhs == rhs || lhs < rhs);
 }
 
 
-bool operator>=(const UBigInt &lhs, const UBigInt &rhs) { 
+inline bool operator>=(const UBigInt &lhs, const UBigInt &rhs) { 
     return (lhs == rhs || lhs > rhs);
 }
 
 
-bool operator!=(const UBigInt &lhs, const UBigInt &rhs) {
+inline bool operator!=(const UBigInt &lhs, const UBigInt &rhs) {
     return !(lhs == rhs);
 }
 
 
-UBigInt& UBigInt::operator+=(const UBigInt &rhs) {
+inline UBigInt& UBigInt::operator+=(const UBigInt &rhs) {
     int carry = 0;
     for (int i = 0; i < std::max(num.size(), rhs.num.size()); i++) {
         int column_sum = carry;
@@ -175,7 +176,7 @@ UBigInt& UBigInt::operator+=(const UBigInt &rhs) {
 }
 
 
-UBigInt& UBigInt::operator-=(const UBigInt &rhs) {
+inline UBigInt& UBigInt::operator-=(const UBigInt &rhs) {
     int borrow = 0;
     if (rhs == *this) {
         *this = 0;
@@ -201,65 +202,65 @@ UBigInt& UBigInt::operator-=(const UBigInt &rhs) {
 }
 
 
-UBigInt& UBigInt::operator*=(const UBigInt &rhs) {
+inline UBigInt& UBigInt::operator*=(const UBigInt &rhs) {
     *this = elementary_mult(*this, rhs);
     return *this;
 }
 
 
-UBigInt& UBigInt::operator/=(const UBigInt &rhs) {
+inline UBigInt& UBigInt::operator/=(const UBigInt &rhs) {
     *this = long_division(rhs);
     return *this;
 }
 
 
-UBigInt& UBigInt::operator++() {
+inline UBigInt& UBigInt::operator++() {
     *this += 1;
     return *this;
 }
 
 
-UBigInt& UBigInt::operator--() {
+inline UBigInt& UBigInt::operator--() {
     *this -= 1;
     return *this;
 }
 
 
-UBigInt UBigInt::operator++(int) {
+inline UBigInt UBigInt::operator++(int) {
     UBigInt pre(*this);
     *this += 1;
     return pre;
 }
 
 
-UBigInt UBigInt::operator--(int) {
+inline UBigInt UBigInt::operator--(int) {
     UBigInt pre(*this);
     *this -= 1;
     return pre;
 }
 
 
-UBigInt operator+(const UBigInt &lhs, const UBigInt &rhs) {
+inline UBigInt operator+(const UBigInt &lhs, const UBigInt &rhs) {
     return UBigInt(lhs) += rhs;
 }
 
 
-UBigInt operator-(const UBigInt &lhs, const UBigInt &rhs) {
+inline UBigInt operator-(const UBigInt &lhs, const UBigInt &rhs) {
     return UBigInt(lhs) -= rhs;
 } 
 
 
-UBigInt operator*(const UBigInt &lhs, const UBigInt &rhs) {
+inline UBigInt operator*(const UBigInt &lhs, const UBigInt &rhs) {
     return UBigInt(lhs) *= rhs;
 }
 
 
-UBigInt operator/(const UBigInt &lhs, const UBigInt &rhs) {
+inline UBigInt operator/(const UBigInt &lhs, const UBigInt &rhs) {
     return UBigInt(lhs) /= rhs;
 }
 
 
-UBigInt UBigInt::elementary_mult(const UBigInt &lhs, const UBigInt &rhs) {
+inline UBigInt UBigInt::elementary_mult(const UBigInt &lhs, const UBigInt &rhs) {
     if (lhs == 0 || rhs == 0) {
         return 0;
     }
@@ -293,7 +294,7 @@ UBigInt UBigInt::elementary_mult(const UBigInt &lhs, const UBigInt &rhs) {
 }
 
 
-UBigInt UBigInt::divide_primative(const UBigInt &rhs) {
+inline UBigInt UBigInt::divide_primative(const UBigInt &rhs) {
     UBigInt count{0}; 
     auto total = *this;
     while (total >= rhs) {
@@ -304,7 +305,7 @@ UBigInt UBigInt::divide_primative(const UBigInt &rhs) {
 }
 
 
-UBigInt UBigInt::long_division(const UBigInt &rhs) {
+inline UBigInt UBigInt::long_division(const UBigInt &rhs) {
     UBigInt temp{0};
     UBigInt sol;
     if (rhs > *this) {
@@ -335,7 +336,7 @@ UBigInt UBigInt::long_division(const UBigInt &rhs) {
     }
 }
 
-UBigInt& UBigInt::randomize(const size_t &length) {
+inline UBigInt& UBigInt::randomize(const size_t &length) {
     std::srand(std::time(nullptr));
     std::vector<int> va(length);
     std::generate(va.begin(), va.end(), [](){return std::rand() % 10;});
@@ -344,7 +345,7 @@ UBigInt& UBigInt::randomize(const size_t &length) {
 }
 
 
-UBigInt UBigInt::get_slice(size_t start_index, size_t end_index) { 
+inline UBigInt UBigInt::get_slice(size_t start_index, size_t end_index) { 
     while(num[start_index] == 0 && start_index < end_index) {
         start_index++;
     }
@@ -352,7 +353,7 @@ UBigInt UBigInt::get_slice(size_t start_index, size_t end_index) {
 }
 
 
-UBigInt& UBigInt::power(const UBigInt &rhs) {
+inline UBigInt& UBigInt::power(const UBigInt &rhs) {
     if (rhs == 0) {
         *this = {1};
     }
@@ -368,7 +369,7 @@ UBigInt& UBigInt::power(const UBigInt &rhs) {
 }
 
 
-UBigInt& UBigInt::shift10(int m) {
+inline UBigInt& UBigInt::shift10(int m) {
     if(m > 0) {
         num.resize(num.size() + m);
     }

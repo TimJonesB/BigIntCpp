@@ -11,7 +11,23 @@ class BigInt {
 public:
     BigInt() = default;
     BigInt(char rhs, bool negative=0): magnitude{rhs}, neg{negative} {}
-    BigInt(std::string rhs);
+    BigInt(std::string s) {
+        neg = false;
+        int i = 0;
+        while (s[i] == ' ') {
+            i++;
+        }
+        if (s[i] == '-' || s[i] == '+') {
+            if (s[i] == '-') {
+                neg = true;
+            }
+            i++;
+        }
+        magnitude = s.substr(i, s.size());
+        if (magnitude == 0) {
+            neg = false;
+        }
+    }
     BigInt(UBigInt rhs, bool negative=0) : magnitude{rhs}, neg{negative} {}
     template <class T,
               typename std::enable_if<std::is_integral<T>::value, int>::type* = nullptr>
@@ -28,64 +44,46 @@ public:
                                                     neg{negative} {}
     BigInt(const BigInt &rhs) = default;
     BigInt(BigInt &&rhs) = default;
-    BigInt& operator=(const BigInt &rhs) = default;
-    BigInt& operator=(BigInt &&rhs) = default;
-    ~BigInt() = default;
-
-    BigInt& operator+=(const BigInt &rhs);
-    BigInt& operator-=(const BigInt &rhs);
-    BigInt& operator*=(const BigInt &rhs);
-    BigInt operator/=(const BigInt &rhs);
-    BigInt& operator++();
-    BigInt& operator--();
-    BigInt operator++(int);
-    BigInt operator--(int);
-    friend BigInt operator+(const BigInt &lhs, const BigInt &rhs);
-    friend BigInt operator-(const BigInt &lhs, const BigInt &rhs);
-    friend BigInt operator*(const BigInt &lhs, const BigInt &rhs);
-    friend BigInt operator/(const BigInt &lhs, const BigInt &rhs);
-    friend bool operator>(const BigInt &lhs, const BigInt &rhs);
-    friend bool operator<(const BigInt &lhs, const BigInt &rhs);
-    friend bool operator==(const BigInt &lhs, const BigInt &rhs);
-    friend bool operator!=(const BigInt &lhs, const BigInt &rhs);
-    friend bool operator>=(const BigInt &lhs, const BigInt &rhs);
-    friend bool operator<=(const BigInt &lhs, const BigInt &rhs);
-    friend std::ostream& operator<<(std::ostream &out, const BigInt &rhs);
-    BigInt& randomize(const size_t &length);
-    BigInt& power(const BigInt &rhs);
-    BigInt& shift10(int m=1);
-    BigInt& abs();
+    inline  ~BigInt() = default;
+    inline  BigInt& operator=(const BigInt &rhs) = default;
+    inline  BigInt& operator=(BigInt &&rhs) = default;
+    inline  BigInt& operator+=(const BigInt &rhs);
+    inline  BigInt& operator-=(const BigInt &rhs);
+    inline  BigInt& operator*=(const BigInt &rhs);
+    inline  BigInt operator/=(const BigInt &rhs);
+    inline  BigInt& operator++();
+    inline  BigInt& operator--();
+    inline  BigInt operator++(int);
+    inline  BigInt operator--(int);
+    inline  friend BigInt operator+(const BigInt &lhs, const BigInt &rhs);
+    inline  friend BigInt operator-(const BigInt &lhs, const BigInt &rhs);
+    inline  friend BigInt operator*(const BigInt &lhs, const BigInt &rhs);
+    inline  friend BigInt operator/(const BigInt &lhs, const BigInt &rhs);
+    inline  friend bool operator>(const BigInt &lhs, const BigInt &rhs);
+    inline  friend bool operator<(const BigInt &lhs, const BigInt &rhs);
+    inline  friend bool operator==(const BigInt &lhs, const BigInt &rhs);
+    inline  friend bool operator!=(const BigInt &lhs, const BigInt &rhs);
+    inline  friend bool operator>=(const BigInt &lhs, const BigInt &rhs);
+    inline  friend bool operator<=(const BigInt &lhs, const BigInt &rhs);
+    inline  friend std::ostream& operator<<(std::ostream &out, const BigInt &rhs);
+    inline  BigInt& randomize(const size_t &length);
+    inline  BigInt& power(const BigInt &rhs);
+    inline  BigInt& shift10(int m=1);
+    inline  BigInt& abs();
+    inline  BigInt& set_karatsuba_thres(size_t thres); 
     size_t get_length() {return magnitude.get_length();}
-    BigInt& set_karatsuba_thres(size_t thres); 
     size_t get_karatsuba_thres() {return this->karatsuba_thres;}
 private:
     UBigInt magnitude;
     bool neg = false;
     size_t karatsuba_thres = 48;
-    BigInt karatsuba(BigInt lhs, BigInt rhs);
+    inline BigInt karatsuba(BigInt lhs, BigInt rhs);
 };
 
 
-BigInt::BigInt(std::string s) {
-    neg = false;
-    int i = 0;
-    while (s[i] == ' ') {
-        i++;
-    }
-    if (s[i] == '-' || s[i] == '+') {
-        if (s[i] == '-') {
-            neg = true;
-        }
-        i++;
-    }
-    magnitude = s.substr(i, s.size());
-    if (magnitude == 0) {
-        neg = false;
-    }
-}
 
 
-std::ostream& operator<<(std::ostream &out, const BigInt &rhs) {
+inline std::ostream& operator<<(std::ostream &out, const BigInt &rhs) {
     if (rhs.neg) {
         std::cout << '-';
     }
@@ -94,7 +92,7 @@ std::ostream& operator<<(std::ostream &out, const BigInt &rhs) {
 }
 
 
-BigInt& BigInt::operator+=(const BigInt &rhs) {
+inline BigInt& BigInt::operator+=(const BigInt &rhs) {
     if (neg && !rhs.neg) {
         if (magnitude == rhs.magnitude) {
             magnitude = {0};
@@ -139,7 +137,7 @@ BigInt& BigInt::operator+=(const BigInt &rhs) {
 }
 
 
-BigInt& BigInt::operator-=(const BigInt &rhs) {
+inline BigInt& BigInt::operator-=(const BigInt &rhs) {
     if (neg && !rhs.neg) {
         neg = true;
         magnitude += rhs.magnitude;
@@ -180,7 +178,7 @@ BigInt& BigInt::operator-=(const BigInt &rhs) {
 }
 
 
-BigInt& BigInt::operator*=(const BigInt &rhs) {
+inline BigInt& BigInt::operator*=(const BigInt &rhs) {
     bool negative = (neg != rhs.neg); 
     *this = karatsuba(*this, rhs);
     neg = negative;
@@ -188,7 +186,7 @@ BigInt& BigInt::operator*=(const BigInt &rhs) {
 }
 
 
-BigInt BigInt:: operator/=(const BigInt &rhs) {
+inline BigInt BigInt:: operator/=(const BigInt &rhs) {
     if (rhs.magnitude > magnitude) {
         magnitude = 0;
         neg = false;
@@ -201,53 +199,53 @@ BigInt BigInt:: operator/=(const BigInt &rhs) {
 }
 
 
-BigInt& BigInt::operator++() {
+inline BigInt& BigInt::operator++() {
     *this += 1;
     return *this;
 }
 
 
-BigInt& BigInt::operator--() {
+inline BigInt& BigInt::operator--() {
     *this -= 1;
     return *this;
 }
 
 
-BigInt BigInt::operator++(int) {
+inline BigInt BigInt::operator++(int) {
     BigInt pre(*this);
     *this += 1;
     return pre;
 }
 
 
-BigInt BigInt::operator--(int) {
+inline BigInt BigInt::operator--(int) {
     BigInt pre(*this);
     *this -= 1;
     return pre;
 }
 
 
-BigInt operator+(const BigInt &lhs, const BigInt &rhs) {
+inline BigInt operator+(const BigInt &lhs, const BigInt &rhs) {
     return BigInt(lhs) += rhs;
 }
 
 
-BigInt operator-(const BigInt &lhs, const BigInt &rhs) {
+inline BigInt operator-(const BigInt &lhs, const BigInt &rhs) {
     return BigInt(lhs) -= rhs;
 } 
 
 
-BigInt operator*(const BigInt &lhs, const BigInt &rhs) {
+inline BigInt operator*(const BigInt &lhs, const BigInt &rhs) {
     return BigInt(lhs) *= rhs;
 }
 
 
-BigInt operator/(const BigInt &lhs, const BigInt &rhs) {
+inline BigInt operator/(const BigInt &lhs, const BigInt &rhs) {
     return BigInt(lhs) /= rhs;
 }
 
 
-bool operator>(const BigInt &lhs, const BigInt &rhs) {
+inline bool operator>(const BigInt &lhs, const BigInt &rhs) {
     if (lhs.neg && !rhs.neg) {
         return false;
     }
@@ -263,7 +261,7 @@ bool operator>(const BigInt &lhs, const BigInt &rhs) {
 }
 
 
-bool operator<(const BigInt &lhs, const BigInt &rhs) {
+inline bool operator<(const BigInt &lhs, const BigInt &rhs) {
     if (lhs.neg && !rhs.neg) {
         return true;
     }
@@ -279,7 +277,7 @@ bool operator<(const BigInt &lhs, const BigInt &rhs) {
 }
 
 
-bool operator==(const BigInt &lhs, const BigInt &rhs) {
+inline bool operator==(const BigInt &lhs, const BigInt &rhs) {
     if (lhs.neg != rhs.neg) {
         return false;
     }
@@ -287,28 +285,28 @@ bool operator==(const BigInt &lhs, const BigInt &rhs) {
 }
 
 
-bool operator!=(const BigInt &lhs, const BigInt &rhs) {
+inline bool operator!=(const BigInt &lhs, const BigInt &rhs) {
     return !(lhs == rhs);
 }
 
 
-bool operator>=(const BigInt &lhs, const BigInt &rhs) {
+inline bool operator>=(const BigInt &lhs, const BigInt &rhs) {
     return (lhs == rhs || lhs > rhs);
 }
 
 
-bool operator<=(const BigInt &lhs, const BigInt &rhs) {
+inline bool operator<=(const BigInt &lhs, const BigInt &rhs) {
     return (lhs == rhs || lhs < rhs);
 }
 
 
-BigInt& BigInt::set_karatsuba_thres(size_t thres) {
+inline BigInt& BigInt::set_karatsuba_thres(size_t thres) {
     this->karatsuba_thres = thres;
     return *this;
 }
 
 
-BigInt BigInt::karatsuba(BigInt lhs, BigInt rhs) {
+inline BigInt BigInt::karatsuba(BigInt lhs, BigInt rhs) {
     if (lhs.get_length() < karatsuba_thres || rhs.get_length() < karatsuba_thres) {
         return lhs.magnitude *= rhs.magnitude;
     }
@@ -341,13 +339,13 @@ BigInt BigInt::karatsuba(BigInt lhs, BigInt rhs) {
 }
 
 
-BigInt& BigInt::randomize(const size_t &length) {
+inline BigInt& BigInt::randomize(const size_t &length) {
     neg = std::rand() % 2;
     *this = BigInt(UBigInt().randomize(length), neg);
     return *this;
 }
 
-BigInt& BigInt::power(const BigInt &rhs) {
+inline BigInt& BigInt::power(const BigInt &rhs) {
     if (rhs == 0) {
         *this = {1};
     }
@@ -366,13 +364,13 @@ BigInt& BigInt::power(const BigInt &rhs) {
 }
 
 
-BigInt& BigInt::abs() {
+inline BigInt& BigInt::abs() {
     neg = false;
     return *this;
 }
 
 
-BigInt& BigInt::shift10(int m) {
+inline BigInt& BigInt::shift10(int m) {
     magnitude.shift10(m);
     return *this;
 }
