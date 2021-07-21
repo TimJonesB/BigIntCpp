@@ -10,14 +10,19 @@
 #include <algorithm>
 
 
+/** 
+ * @brief Unsigned BigInt class. 
+ * Uses std::deque<int> for dynamic storage
+ */
+
 class UBigInt {
 public:
     UBigInt() = default;
     UBigInt(char rhs): num{rhs-'0'} {}
     UBigInt(std::string s) {
         std::unordered_map<char,int> s2num{{'0',0}, {'1',1}, {'2',2},
-                                        {'3',3}, {'4',4}, {'5',5},
-                                        {'6',6}, {'7',7}, {'8',8},{'9',9}};
+                                           {'3',3}, {'4',4}, {'5',5},
+                                           {'6',6}, {'7',7}, {'8',8},{'9',9}};
         int i = 0;
         while (s[i] == ' ') {
             i++;

@@ -7,6 +7,11 @@
 
 #include "ubigint.h"
 
+/** 
+ * @brief Signed arbitrarily big integer class. 
+ * Uses std::deque<int> for dynamic storage. Stores magnitude in unsigned UBigInt member.
+ */
+
 class BigInt {
 public:
     BigInt() = default;
@@ -82,7 +87,10 @@ private:
 
 
 
-
+/** 
+ * @brief Overloaded BigInt insertion operator prints sign and value of BigInt
+ * @returns Reference to output stream
+ */
 inline std::ostream& operator<<(std::ostream &out, const BigInt &rhs) {
     if (rhs.neg) {
         std::cout << '-';
@@ -92,6 +100,10 @@ inline std::ostream& operator<<(std::ostream &out, const BigInt &rhs) {
 }
 
 
+/** 
+ * @brief Overloaded BigInt addition assignment operator 
+ * @returns Reference to modified instance 
+ */
 inline BigInt& BigInt::operator+=(const BigInt &rhs) {
     if (neg && !rhs.neg) {
         if (magnitude == rhs.magnitude) {
@@ -107,7 +119,6 @@ inline BigInt& BigInt::operator+=(const BigInt &rhs) {
             magnitude -= rhs.magnitude;
         }
     }
-
     else if (!neg && rhs.neg) {
         if (magnitude == rhs.magnitude) {
             magnitude = {0};
@@ -122,7 +133,6 @@ inline BigInt& BigInt::operator+=(const BigInt &rhs) {
             magnitude -= rhs.magnitude;
         }
     }
-
     else if(!neg && !rhs.neg) {
         neg = false;
         magnitude += rhs.magnitude;
@@ -132,11 +142,14 @@ inline BigInt& BigInt::operator+=(const BigInt &rhs) {
         neg = true;
         magnitude += rhs.magnitude;
     }
-
     return *this;
 }
 
 
+/** 
+ * @brief Overloaded BigInt subtraction assignment operator 
+ * @returns Reference to modified instance 
+ */
 inline BigInt& BigInt::operator-=(const BigInt &rhs) {
     if (neg && !rhs.neg) {
         neg = true;
@@ -178,6 +191,10 @@ inline BigInt& BigInt::operator-=(const BigInt &rhs) {
 }
 
 
+/** 
+ * @brief Overloaded BigInt multiplication assignment operator 
+ * @returns Reference to modified instance 
+ */
 inline BigInt& BigInt::operator*=(const BigInt &rhs) {
     bool negative = (neg != rhs.neg); 
     *this = karatsuba(*this, rhs);
@@ -186,6 +203,10 @@ inline BigInt& BigInt::operator*=(const BigInt &rhs) {
 }
 
 
+/** 
+ * @brief Overloaded BigInt division assignment operator 
+ * @returns Reference to modified instance 
+ */
 inline BigInt BigInt:: operator/=(const BigInt &rhs) {
     if (rhs.magnitude > magnitude) {
         magnitude = 0;
@@ -199,18 +220,29 @@ inline BigInt BigInt:: operator/=(const BigInt &rhs) {
 }
 
 
+/** 
+ * @brief Overloaded BigInt postfix increment operator 
+ * @returns Reference to modified instance 
+ */
 inline BigInt& BigInt::operator++() {
     *this += 1;
     return *this;
 }
 
 
+/** 
+ * @brief Overloaded BigInt postfix decrement operator 
+ * @returns Reference to modified instance 
+ */
 inline BigInt& BigInt::operator--() {
     *this -= 1;
     return *this;
 }
 
-
+/** 
+ * @brief Overloaded BigInt prefix increment operator 
+ * @returns copy of new instance 
+ */
 inline BigInt BigInt::operator++(int) {
     BigInt pre(*this);
     *this += 1;
@@ -218,6 +250,10 @@ inline BigInt BigInt::operator++(int) {
 }
 
 
+/** 
+ * @brief Overloaded BigInt prefix decrement operator 
+ * @returns copy of new instance 
+ */
 inline BigInt BigInt::operator--(int) {
     BigInt pre(*this);
     *this -= 1;
@@ -225,25 +261,46 @@ inline BigInt BigInt::operator--(int) {
 }
 
 
+/** 
+ * @brief Overloaded BigInt binary addition operator 
+ * @returns copy of new instance 
+ */
 inline BigInt operator+(const BigInt &lhs, const BigInt &rhs) {
     return BigInt(lhs) += rhs;
 }
 
 
+/** 
+ * @brief Overloaded BigInt binary subtraction operator 
+ * @returns copy of new instance 
+ */
 inline BigInt operator-(const BigInt &lhs, const BigInt &rhs) {
     return BigInt(lhs) -= rhs;
 } 
 
 
+/** 
+ * @brief Overloaded BigInt binary multiplication operator 
+ * @returns copy of new instance 
+ */
 inline BigInt operator*(const BigInt &lhs, const BigInt &rhs) {
     return BigInt(lhs) *= rhs;
 }
 
 
+/** 
+ * @brief Overloaded BigInt binary division operator 
+ * @returns copy of new instance 
+ */
 inline BigInt operator/(const BigInt &lhs, const BigInt &rhs) {
     return BigInt(lhs) /= rhs;
 }
 
+
+/** 
+ * @brief Overloaded BigInt binary division operator 
+ * @returns copy of new instance 
+ */
 
 inline bool operator>(const BigInt &lhs, const BigInt &rhs) {
     if (lhs.neg && !rhs.neg) {
@@ -261,6 +318,10 @@ inline bool operator>(const BigInt &lhs, const BigInt &rhs) {
 }
 
 
+/** 
+ * @brief Overloaded BigInt binary division operator 
+ * @returns copy of new instance 
+ */
 inline bool operator<(const BigInt &lhs, const BigInt &rhs) {
     if (lhs.neg && !rhs.neg) {
         return true;
