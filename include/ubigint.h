@@ -110,11 +110,23 @@ inline std::ostream& operator<<(std::ostream& out, const UBigInt rhs) {
 }
 
 
+/** 
+ * @brief Overloaded UBigInt equal to comparison operator 
+ * @param lhs UBigInt reference lhs of comparison
+ * @param rhs UBigInt reference rhs of comparison
+ * @returns True if lhs number is equal to rhs number 
+ */
 inline bool operator==(const UBigInt &lhs, const UBigInt &rhs) {
     return lhs.num == rhs.num;
 }
 
 
+/** 
+ * @brief Overloaded UBigInt less than comparison operator. Compares number of digits then if number(digits) equal, compares the content of digits.
+ * @param lhs UBigInt reference lhs of comparison
+ * @param rhs UBigInt reference rhs of comparison
+ * @returns True if lhs number magnitude is less than rhs number
+ */
 inline bool operator<(const UBigInt &lhs, const UBigInt &rhs) {
     if (lhs.num.size() < rhs.num.size()) {
         return true;
@@ -129,6 +141,12 @@ inline bool operator<(const UBigInt &lhs, const UBigInt &rhs) {
 }
 
 
+/** 
+ * @brief Overloaded UBigInt greater than comparison operator. Compares number of digits then if number(digits) equal, compares the content of digits.
+ * @param lhs UBigInt reference lhs of comparison
+ * @param rhs UBigInt reference rhs of comparison
+ * @returns True if lhs number magnitude is greater than rhs number
+ */
 inline bool operator>(const UBigInt &lhs, const UBigInt &rhs) {
     if (lhs.num.size() > rhs.num.size()) {
         return true;
@@ -143,21 +161,44 @@ inline bool operator>(const UBigInt &lhs, const UBigInt &rhs) {
 }
 
 
+/** 
+ * @brief Overloaded UBigInt less than or equal to operator.
+ * @param lhs UBigInt reference lhs of comparison
+ * @param rhs UBigInt reference rhs of comparison
+ * @returns True if comparison operator == returns true or operator < returns true
+ */
 inline bool operator<=(const UBigInt &lhs, const UBigInt &rhs) {
     return (lhs == rhs || lhs < rhs);
 }
 
 
+/** 
+ * @brief Overloaded UBigInt greater than or equal to operator.
+ * @param lhs UBigInt reference lhs of comparison
+ * @param rhs UBigInt reference rhs of comparison
+ * @returns True if comparison operator == returns true or operator > returns true
+ */
 inline bool operator>=(const UBigInt &lhs, const UBigInt &rhs) { 
     return (lhs == rhs || lhs > rhs);
 }
 
 
+/** 
+ * @brief Overloaded UBigInt not-equal to comparison operator 
+ * @param lhs BigInt reference lhs of comparison
+ * @param rhs BigInt reference rhs of comparison
+ * @returns True if comparison operator == returns false
+ */
 inline bool operator!=(const UBigInt &lhs, const UBigInt &rhs) {
     return !(lhs == rhs);
 }
 
 
+/** 
+ * @brief Overloaded UBigInt addition assignment operator and core addition algorithm
+ * @param rhs UBigInt reference added to *this
+ * @returns Reference to modified instance 
+ */
 inline UBigInt& UBigInt::operator+=(const UBigInt &rhs) {
     int carry = 0;
     for (int i = 0; i < std::max(num.size(), rhs.num.size()); i++) {
@@ -181,6 +222,11 @@ inline UBigInt& UBigInt::operator+=(const UBigInt &rhs) {
 }
 
 
+/** 
+ * @brief Overloaded UBigInt subtraction assignment operator and core subtraction algorithm
+ * @param rhs UBigInt reference *this is subtracted by
+ * @returns Reference to modified instance 
+ */
 inline UBigInt& UBigInt::operator-=(const UBigInt &rhs) {
     int borrow = 0;
     if (rhs == *this) {
@@ -207,30 +253,53 @@ inline UBigInt& UBigInt::operator-=(const UBigInt &rhs) {
 }
 
 
+/** 
+ * @brief Overloaded UBigInt multplication assignment operator
+ * @param rhs UBigInt reference multplied by *this
+ * @returns Reference to modified instance 
+ */
 inline UBigInt& UBigInt::operator*=(const UBigInt &rhs) {
     *this = elementary_mult(*this, rhs);
     return *this;
 }
 
 
+/** 
+ * @brief Overloaded UBigInt division assignment operator
+ * @param rhs UBigInt reference *this is divided by
+ * @returns Reference to modified instance 
+ */
 inline UBigInt& UBigInt::operator/=(const UBigInt &rhs) {
     *this = long_division(rhs);
     return *this;
 }
 
 
+/** 
+ * @brief Overloaded BigInt postfix increment operator 
+ * @returns Reference to modified instance 
+ */
 inline UBigInt& UBigInt::operator++() {
     *this += 1;
     return *this;
 }
 
 
+/** 
+ * @brief Overloaded BigInt postfix decrement operator 
+ * @returns Reference to modified instance 
+ */
 inline UBigInt& UBigInt::operator--() {
     *this -= 1;
     return *this;
 }
 
 
+/** 
+ * @brief Overloaded BigInt prefix increment operator 
+ * @param _ Placeholder integer argument
+ * @returns Copy of new instance 
+ */
 inline UBigInt UBigInt::operator++(int) {
     UBigInt pre(*this);
     *this += 1;
@@ -238,6 +307,11 @@ inline UBigInt UBigInt::operator++(int) {
 }
 
 
+/** 
+ * @brief Overloaded BigInt prefix decrement operator 
+ * @param _ Placeholder integer argument
+ * @returns Copy of new instance 
+ */
 inline UBigInt UBigInt::operator--(int) {
     UBigInt pre(*this);
     *this -= 1;
@@ -245,21 +319,45 @@ inline UBigInt UBigInt::operator--(int) {
 }
 
 
+/** 
+ * @brief Overloaded UBigInt binary addition operator 
+ * @param lhs UBigInt reference lhs component of sum
+ * @param rhs UBigInt reference rhs component of sum
+ * @returns Copy of new instance 
+ */
 inline UBigInt operator+(const UBigInt &lhs, const UBigInt &rhs) {
     return UBigInt(lhs) += rhs;
 }
 
 
+/** 
+ * @brief Overloaded UBigInt binary subtraction operator 
+ * @param lhs UBigInt reference lhs component of difference
+ * @param rhs UBigInt reference rhs component of difference
+ * @returns Copy of new instance 
+ */
 inline UBigInt operator-(const UBigInt &lhs, const UBigInt &rhs) {
     return UBigInt(lhs) -= rhs;
 } 
 
 
+/** 
+ * @brief Overloaded UBigInt binary multiplication operator 
+ * @param lhs UBigInt reference lhs component of product
+ * @param rhs UBigInt reference rhs component of product
+ * @returns Copy of new instance 
+ */
 inline UBigInt operator*(const UBigInt &lhs, const UBigInt &rhs) {
     return UBigInt(lhs) *= rhs;
 }
 
 
+/** 
+ * @brief Overloaded UBigInt binary division operator 
+ * @param lhs UBigInt reference lhs (numerator) component of product
+ * @param rhs UBigInt reference rhs (denominator) component of product
+ * @returns Copy of new instance 
+ */
 inline UBigInt operator/(const UBigInt &lhs, const UBigInt &rhs) {
     return UBigInt(lhs) /= rhs;
 }
