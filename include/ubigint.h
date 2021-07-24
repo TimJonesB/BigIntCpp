@@ -11,10 +11,9 @@
 
 
 /** 
- * @brief Unsigned BigInt class. 
+ * @brief Signed arbitrarily "big" precision unsigned integer class; Handles magnitude manipulation for BigInt class as a member by composition; Can be used stand-alone
  * Uses std::deque<int> for dynamic storage
  */
-
 class UBigInt {
 public:
     UBigInt() = default;
@@ -101,7 +100,12 @@ private:
 };
 
 
-
+/** 
+ * @brief Overloaded UBigInt insertion operator prints sign and value of UBigInt
+ * @param out Output stream reference
+ * @param rhs Subject UBigInt refence to stream
+ * @returns Reference to output stream
+ */
 inline std::ostream& operator<<(std::ostream& out, const UBigInt rhs) {
     for (const auto it : rhs.num) {
         std::cout << it;
@@ -363,6 +367,12 @@ inline UBigInt operator/(const UBigInt &lhs, const UBigInt &rhs) {
 }
 
 
+/** 
+ * @brief Utility method which implements core elementary multiplication algorithm
+ * @param lhs Left hand portion of multiplication algorithm
+ * @param rhs Right hand portion of multiplication algorithm
+ * @returns Copy of product instance
+ */
 inline UBigInt UBigInt::elementary_mult(const UBigInt &lhs, const UBigInt &rhs) {
     if (lhs == 0 || rhs == 0) {
         return 0;
@@ -397,6 +407,11 @@ inline UBigInt UBigInt::elementary_mult(const UBigInt &lhs, const UBigInt &rhs) 
 }
 
 
+/** 
+ * @brief Utility primitive integer division algorithm which counts how many rhs in *this
+ * @param rhs Divisor of division method
+ * @returns Copy of quotient instance 
+ */
 inline UBigInt UBigInt::divide_primative(const UBigInt &rhs) {
     UBigInt count{0}; 
     auto total = *this;
@@ -408,6 +423,11 @@ inline UBigInt UBigInt::divide_primative(const UBigInt &rhs) {
 }
 
 
+/** 
+ * @brief Utility method which implements core long division algorithm
+ * @param rhs Divisor of division algo
+ * @returns Copy of quotient instance
+ */
 inline UBigInt UBigInt::long_division(const UBigInt &rhs) {
     UBigInt temp{0};
     UBigInt sol;
@@ -439,6 +459,11 @@ inline UBigInt UBigInt::long_division(const UBigInt &rhs) {
     }
 }
 
+/** 
+ * @brief  Randomizes UBigInt instance sign and magnitude to specified number of digits
+ * @param length Specified number of digits
+ * @returns Reference to modified UBigInt
+ */
 inline UBigInt& UBigInt::randomize(const size_t &length) {
     std::srand(std::time(nullptr));
     std::vector<int> va(length);
@@ -448,6 +473,12 @@ inline UBigInt& UBigInt::randomize(const size_t &length) {
 }
 
 
+/** 
+ * @brief  Utility method to extract slice of BigInt from a start to end index
+ * @param  start_index Index of the beginning of the chunk to extract.
+ * @param  end_index Index of the end of the chunk to extract.
+ * @returns copy of extracted UBigInt
+ */
 inline UBigInt UBigInt::get_slice(size_t start_index, size_t end_index) { 
     while(num[start_index] == 0 && start_index < end_index) {
         start_index++;
@@ -456,6 +487,11 @@ inline UBigInt UBigInt::get_slice(size_t start_index, size_t end_index) {
 }
 
 
+/** 
+ * @brief  UBigInt's primitive exponent utility method
+ * @param rhs Exponent to raise base *this by
+ * @returns Reference to modified UBigInt
+ */
 inline UBigInt& UBigInt::power(const UBigInt &rhs) {
     if (rhs == 0) {
         *this = {1};
@@ -472,6 +508,11 @@ inline UBigInt& UBigInt::power(const UBigInt &rhs) {
 }
 
 
+/** 
+ * @brief  UBigInt's base-10 shift utility method; resizes if necessary
+ * @param m Number of places to shift forward or back
+ * @returns Reference to modified UBigInt
+ */
 inline UBigInt& UBigInt::shift10(int m) {
     if(m > 0) {
         num.resize(num.size() + m);

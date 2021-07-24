@@ -8,7 +8,7 @@
 #include "ubigint.h"
 
 /** 
- * @brief Signed arbitrarily big integer class. 
+ * @brief Signed arbitrarily "big" precision integer class.
  * Uses std::deque<int> for dynamic storage. Stores magnitude by composition in unsigned UBigInt member.
  */
 
@@ -90,7 +90,7 @@ private:
 /** 
  * @brief Overloaded BigInt insertion operator prints sign and value of BigInt
  * @param out Output stream reference
- * @param rhs Subject BigInt refence to stream.
+ * @param rhs Subject BigInt refence to stream
  * @returns Reference to output stream
  */
 inline std::ostream& operator<<(std::ostream &out, const BigInt &rhs) {
@@ -104,7 +104,7 @@ inline std::ostream& operator<<(std::ostream &out, const BigInt &rhs) {
 
 /** 
  * @brief Overloaded BigInt addition assignment operator 
- * @param rhs BigInt reference added to *this.
+ * @param rhs BigInt reference added to *this
  * @returns Reference to modified instance 
  */
 inline BigInt& BigInt::operator+=(const BigInt &rhs) {
@@ -151,7 +151,7 @@ inline BigInt& BigInt::operator+=(const BigInt &rhs) {
 
 /** 
  * @brief Overloaded BigInt subtraction assignment operator 
- * @param rhs BigInt reference subtracted from *this.
+ * @param rhs BigInt reference subtracted from *this
  * @returns Reference to modified instance 
  */
 inline BigInt& BigInt::operator-=(const BigInt &rhs) {
@@ -197,7 +197,7 @@ inline BigInt& BigInt::operator-=(const BigInt &rhs) {
 
 /** 
  * @brief Overloaded BigInt multiplication assignment operator 
- * @param rhs BigInt reference multiplied by *this.
+ * @param rhs BigInt reference multiplied by *this
  * @returns Reference to modified instance 
  */
 inline BigInt& BigInt::operator*=(const BigInt &rhs) {
@@ -210,7 +210,7 @@ inline BigInt& BigInt::operator*=(const BigInt &rhs) {
 
 /** 
  * @brief Overloaded BigInt division assignment operator 
- * @param rhs BigInt reference *this is divided by.
+ * @param rhs BigInt reference *this is divided by
  * @returns Reference to modified instance 
  */
 inline BigInt BigInt:: operator/=(const BigInt &rhs) {
@@ -417,7 +417,7 @@ inline BigInt& BigInt::set_karatsuba_thres(size_t thres) {
 
 
 /** 
- * @brief Karatsuba recursive multiplication algorithm which recurses at size(magnitude) > karatsuba_thres. Base condition calls elementary multiplication.
+ * @brief Karatsuba recursive multiplication algorithm which recurses at size(magnitude) > karatsuba_thres. Base condition calls elementary multiplication
  * @param lhs Left hand portion of multiplication algorithm
  * @param rhs Right hand portion of multiplication algorithm
  * @returns Copy of BigInt product
