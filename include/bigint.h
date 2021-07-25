@@ -8,8 +8,8 @@
 #include "ubigint.h"
 
 /** 
- * @brief Signed arbitrarily big integer class. 
- * Uses std::deque<int> for dynamic storage. Stores magnitude in unsigned UBigInt member.
+ * @brief Signed arbitrarily "big" precision integer class.
+ * Uses std::deque<int> for dynamic storage. Stores magnitude by composition in unsigned UBigInt member.
  */
 
 class BigInt {
@@ -89,6 +89,8 @@ private:
 
 /** 
  * @brief Overloaded BigInt insertion operator prints sign and value of BigInt
+ * @param out Output stream reference
+ * @param rhs Subject BigInt refence to stream
  * @returns Reference to output stream
  */
 inline std::ostream& operator<<(std::ostream &out, const BigInt &rhs) {
@@ -102,6 +104,7 @@ inline std::ostream& operator<<(std::ostream &out, const BigInt &rhs) {
 
 /** 
  * @brief Overloaded BigInt addition assignment operator 
+ * @param rhs BigInt reference added to *this
  * @returns Reference to modified instance 
  */
 inline BigInt& BigInt::operator+=(const BigInt &rhs) {
@@ -148,6 +151,7 @@ inline BigInt& BigInt::operator+=(const BigInt &rhs) {
 
 /** 
  * @brief Overloaded BigInt subtraction assignment operator 
+ * @param rhs BigInt reference subtracted from *this
  * @returns Reference to modified instance 
  */
 inline BigInt& BigInt::operator-=(const BigInt &rhs) {
@@ -193,6 +197,7 @@ inline BigInt& BigInt::operator-=(const BigInt &rhs) {
 
 /** 
  * @brief Overloaded BigInt multiplication assignment operator 
+ * @param rhs BigInt reference multiplied by *this
  * @returns Reference to modified instance 
  */
 inline BigInt& BigInt::operator*=(const BigInt &rhs) {
@@ -205,6 +210,7 @@ inline BigInt& BigInt::operator*=(const BigInt &rhs) {
 
 /** 
  * @brief Overloaded BigInt division assignment operator 
+ * @param rhs BigInt reference *this is divided by
  * @returns Reference to modified instance 
  */
 inline BigInt BigInt:: operator/=(const BigInt &rhs) {
@@ -241,7 +247,8 @@ inline BigInt& BigInt::operator--() {
 
 /** 
  * @brief Overloaded BigInt prefix increment operator 
- * @returns copy of new instance 
+ * @param _ Placeholder integer argument
+ * @returns Copy of new instance 
  */
 inline BigInt BigInt::operator++(int) {
     BigInt pre(*this);
@@ -252,7 +259,8 @@ inline BigInt BigInt::operator++(int) {
 
 /** 
  * @brief Overloaded BigInt prefix decrement operator 
- * @returns copy of new instance 
+ * @param _ Placeholder integer argument
+ * @returns Copy of new instance 
  */
 inline BigInt BigInt::operator--(int) {
     BigInt pre(*this);
@@ -263,7 +271,9 @@ inline BigInt BigInt::operator--(int) {
 
 /** 
  * @brief Overloaded BigInt binary addition operator 
- * @returns copy of new instance 
+ * @param lhs BigInt reference lhs component of sum
+ * @param rhs BigInt reference rhs component of sum
+ * @returns Copy of new instance 
  */
 inline BigInt operator+(const BigInt &lhs, const BigInt &rhs) {
     return BigInt(lhs) += rhs;
@@ -272,7 +282,9 @@ inline BigInt operator+(const BigInt &lhs, const BigInt &rhs) {
 
 /** 
  * @brief Overloaded BigInt binary subtraction operator 
- * @returns copy of new instance 
+ * @param lhs BigInt reference lhs component of difference
+ * @param rhs BigInt reference rhs component of difference
+ * @returns Copy of new instance 
  */
 inline BigInt operator-(const BigInt &lhs, const BigInt &rhs) {
     return BigInt(lhs) -= rhs;
@@ -281,7 +293,9 @@ inline BigInt operator-(const BigInt &lhs, const BigInt &rhs) {
 
 /** 
  * @brief Overloaded BigInt binary multiplication operator 
- * @returns copy of new instance 
+ * @param lhs BigInt reference lhs component of product
+ * @param rhs BigInt reference rhs component of product
+ * @returns Copy of new instance 
  */
 inline BigInt operator*(const BigInt &lhs, const BigInt &rhs) {
     return BigInt(lhs) *= rhs;
@@ -290,7 +304,9 @@ inline BigInt operator*(const BigInt &lhs, const BigInt &rhs) {
 
 /** 
  * @brief Overloaded BigInt binary division operator 
- * @returns copy of new instance 
+ * @param lhs BigInt reference lhs (numerator) component of product
+ * @param rhs BigInt reference rhs (denominator) component of product
+ * @returns Copy of new instance 
  */
 inline BigInt operator/(const BigInt &lhs, const BigInt &rhs) {
     return BigInt(lhs) /= rhs;
@@ -298,8 +314,10 @@ inline BigInt operator/(const BigInt &lhs, const BigInt &rhs) {
 
 
 /** 
- * @brief Overloaded BigInt binary division operator 
- * @returns copy of new instance 
+ * @brief Overloaded BigInt greater than comparison operator 
+ * @param lhs BigInt reference lhs of comparison
+ * @param rhs BigInt reference rhs of comparison
+ * @returns True if lhs > rhs 
  */
 
 inline bool operator>(const BigInt &lhs, const BigInt &rhs) {
@@ -319,8 +337,10 @@ inline bool operator>(const BigInt &lhs, const BigInt &rhs) {
 
 
 /** 
- * @brief Overloaded BigInt binary division operator 
- * @returns copy of new instance 
+ * @brief Overloaded BigInt less than comparison operator 
+ * @param lhs BigInt reference lhs of comparison
+ * @param rhs BigInt reference rhs of comparison
+ * @returns True if lhs < rhs 
  */
 inline bool operator<(const BigInt &lhs, const BigInt &rhs) {
     if (lhs.neg && !rhs.neg) {
@@ -338,6 +358,12 @@ inline bool operator<(const BigInt &lhs, const BigInt &rhs) {
 }
 
 
+/** 
+ * @brief Overloaded BigInt equal to comparison operator 
+ * @param lhs BigInt reference lhs of comparison
+ * @param rhs BigInt reference rhs of comparison
+ * @returns True if lhs magnitude and sign == rhs magnitude and sign
+ */
 inline bool operator==(const BigInt &lhs, const BigInt &rhs) {
     if (lhs.neg != rhs.neg) {
         return false;
@@ -346,27 +372,56 @@ inline bool operator==(const BigInt &lhs, const BigInt &rhs) {
 }
 
 
+/** 
+ * @brief Overloaded BigInt not-equal to comparison operator 
+ * @param lhs BigInt reference lhs of comparison
+ * @param rhs BigInt reference rhs of comparison
+ * @returns True if comparison operator == returns false
+ */
 inline bool operator!=(const BigInt &lhs, const BigInt &rhs) {
     return !(lhs == rhs);
 }
 
 
+/** 
+ * @brief Overloaded BigInt greater than or equal to comparison operator 
+ * @param lhs BigInt reference lhs of comparison
+ * @param rhs BigInt reference rhs of comparison
+ * @returns True if comparison operator == returns true or operator > returns true
+ */
 inline bool operator>=(const BigInt &lhs, const BigInt &rhs) {
     return (lhs == rhs || lhs > rhs);
 }
 
 
+/** 
+ * @brief Overloaded BigInt less than or equal to comparison operator 
+ * @param lhs BigInt reference lhs of comparison
+ * @param rhs BigInt reference rhs of comparison
+ * @returns True if comparison operator == returns true or operator < returns true
+ */
 inline bool operator<=(const BigInt &lhs, const BigInt &rhs) {
     return (lhs == rhs || lhs < rhs);
 }
 
 
+/** 
+ * @brief Sets karatsuba_thres which is minimum size(magnitude) that uses karatsuba vs. elementary multiplication
+ * @param thres Threshold size
+ * @returns Reference to adjusted instance
+ */
 inline BigInt& BigInt::set_karatsuba_thres(size_t thres) {
     this->karatsuba_thres = thres;
     return *this;
 }
 
 
+/** 
+ * @brief Karatsuba recursive multiplication algorithm which recurses at size(magnitude) > karatsuba_thres. Base condition calls elementary multiplication
+ * @param lhs Left hand portion of multiplication algorithm
+ * @param rhs Right hand portion of multiplication algorithm
+ * @returns Copy of BigInt product
+ */
 inline BigInt BigInt::karatsuba(BigInt lhs, BigInt rhs) {
     if (lhs.get_length() < karatsuba_thres || rhs.get_length() < karatsuba_thres) {
         return lhs.magnitude *= rhs.magnitude;
@@ -400,12 +455,23 @@ inline BigInt BigInt::karatsuba(BigInt lhs, BigInt rhs) {
 }
 
 
+/** 
+ * @brief  Randomizes BigInt instance sign and magnitude to specified number of digits
+ * @param length Specified number of digits
+ * @returns Reference to modified BigInt
+ */
 inline BigInt& BigInt::randomize(const size_t &length) {
     neg = std::rand() % 2;
     *this = BigInt(UBigInt().randomize(length), neg);
     return *this;
 }
 
+
+/** 
+ * @brief  BigInt's exponent utility method
+ * @param rhs Exponent to raise base *this by
+ * @returns Reference to modified BigInt
+ */
 inline BigInt& BigInt::power(const BigInt &rhs) {
     if (rhs == 0) {
         *this = {1};
@@ -425,12 +491,21 @@ inline BigInt& BigInt::power(const BigInt &rhs) {
 }
 
 
+/** 
+ * @brief  BigInt's absolute value utility method
+ * @returns Reference to modified BigInt
+ */
 inline BigInt& BigInt::abs() {
     neg = false;
     return *this;
 }
 
 
+/** 
+ * @brief  BigInt's base-10 shift utility method, calls member magnitudes (UBigInt) shift method
+ * @param m Number of places to shift forward or back
+ * @returns Reference to modified BigInt
+ */
 inline BigInt& BigInt::shift10(int m) {
     magnitude.shift10(m);
     return *this;
