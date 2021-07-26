@@ -1,6 +1,9 @@
 #include <gtest/gtest.h>
 #include "bigint.h"
 
+/**
+ * @brief Unit test (gtest) for addition arithmatic
+ */
 TEST (arithmatic, addition_test) {
     BigInt ta("123");
     BigInt tb("-123");
@@ -31,6 +34,9 @@ TEST (arithmatic, addition_test) {
 }
 	
 
+/**
+ * @brief Unit test (gtest) for subtraction arithmatic
+ */
 TEST (arithmatic, subtraction_test) {
     BigInt ta("123");
     BigInt tb("-123");
@@ -58,6 +64,9 @@ TEST (arithmatic, subtraction_test) {
 }
 
 
+/**
+ * @brief Unit test (gtest) for multplication arithmatic
+ */
 TEST (arithmatic, multiplication_test) {
     BigInt ta("123");
     BigInt tb("-123");
@@ -81,6 +90,9 @@ TEST (arithmatic, multiplication_test) {
 }
 
 
+/**
+ * @brief Unit test (gtest) for division arithmatic
+ */
 TEST (arithmatic, division_test) {
     BigInt ta("123");
     BigInt tb("-123");
