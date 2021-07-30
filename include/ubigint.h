@@ -10,58 +10,20 @@
 #include <algorithm>
 
 
-/** 
+/**
  * @brief Signed arbitrarily "big" precision unsigned integer class; Handles magnitude manipulation for BigInt class as a member by composition; Can be used stand-alone
  * Uses std::deque<int> for dynamic storage
  */
 class UBigInt {
 public:
     UBigInt() = default;
-    UBigInt(char rhs): num{rhs-'0'} {}
-    UBigInt(std::string s) {
-        std::unordered_map<char,int> s2num{{'0',0}, {'1',1}, {'2',2},
-                                           {'3',3}, {'4',4}, {'5',5},
-                                           {'6',6}, {'7',7}, {'8',8},{'9',9}};
-        int i = 0;
-        while (s[i] == ' ') {
-            i++;
-        }
-        while (s[i] == '0' || s[i] == '+' || s[i] == '-') {
-            i++;
-        }
-        while (i < s.size()) { 
-            if (s2num.find(s[i]) == s2num.end()) {
-                throw std::runtime_error("Invalid character in string");
-            }
-            num.push_back(s2num[s[i]]);
-            i++;
-        }
-        if (num.empty()) {
-            num = {0};
-        }
-    };
+    inline UBigInt(char rhs);
+    inline UBigInt(std::string s);
     template <class T,
               typename std::enable_if<std::is_integral<T>::value, int>::type* = nullptr>
-    UBigInt(T rhs) {
-        std::stack<int> st;
-        if (rhs == 0) {
-            num = {0};
-        }
-        if (rhs < 0) {
-            rhs = -1 * rhs;
-        }
-        while (rhs > 0) {
-            int pop = rhs % 10;
-            st.push(pop);
-            rhs = rhs/10;
-        }
-        while (!st.empty()) {
-            num.push_back(st.top());
-            st.pop();
-        }
-    }
+    inline UBigInt(T rhs);
     template <typename Iter>
-    UBigInt(Iter begin, Iter end) : num{begin, end} {}
+    inline UBigInt(Iter begin, Iter end);
     UBigInt(const UBigInt &rhs) = default;
     UBigInt(UBigInt &&rhs) = default;
     UBigInt& operator=(const UBigInt &rhs) = default;
@@ -94,13 +56,93 @@ public:
 
 private:
     std::deque<int> num;
-    inline UBigInt elementary_mult(const UBigInt &lhs, const UBigInt &rhs);
+    inline UBigInt long_multiplication(const UBigInt &lhs, const UBigInt &rhs);
     inline UBigInt divide_primative(const UBigInt &rhs);
     inline UBigInt long_division(const UBigInt &rhs);
 };
 
 
-/** 
+/**
+ * @brief UBigInt single char ctor
+ * @param rhs character to place into magnitude
+ * @param negative negative sign (Default=0)
+ */
+inline UBigInt::UBigInt(char rhs): num{rhs-'0'} {}
+
+
+/**
+ * @brief UBigInt std::string ctor
+ * @param s std::string to parse into num
+ */
+inline UBigInt::UBigInt(std::string s) {
+    std::unordered_map<char,int> s2num{{'0',0}, {'1',1}, {'2',2},
+                                       {'3',3}, {'4',4}, {'5',5},
+                                       {'6',6}, {'7',7}, {'8',8},{'9',9}};
+    int i = 0;
+    while (s[i] == ' ') {
+        i++;
+    }
+    while (s[i] == '0' || s[i] == '+' || s[i] == '-') {
+        i++;
+    }
+    while (i < s.size()) {
+        if (s2num.find(s[i]) == s2num.end()) {
+            throw std::runtime_error("Invalid character in string");
+        }
+        num.push_back(s2num[s[i]]);
+        i++;
+    }
+    if (num.empty()) {
+        num = {0};
+    }
+};
+
+
+/**
+ * @brief UBigInt generic integral ctor
+ * @param rhs integral value to place in num
+ */
+template <class T,
+            typename std::enable_if<std::is_integral<T>::value, int>::type*>
+inline UBigInt::UBigInt(T rhs) {
+    std::stack<int> st;
+    if (rhs == 0) {
+        num = {0};
+    }
+    if (rhs < 0) {
+        rhs = -1 * rhs;
+    }
+    while (rhs > 0) {
+        int pop = rhs % 10;
+        st.push(pop);
+        rhs = rhs/10;
+    }
+    while (!st.empty()) {
+        num.push_back(st.top());
+        st.pop();
+    }
+}
+
+
+/**
+ * @brief UBigInt generic iterator ctor
+ * @param begin beginning iterator of range to copy
+ * @param end end iterator of range to copy
+ * @param negative negative sign (Default=0)
+ */
+template <typename Iter>
+inline UBigInt::UBigInt(Iter begin, Iter end) {
+    for (auto it = begin; it != end; it++) {
+        if (*it < 0 || *it > 9) {
+            throw std::runtime_error("BigIntCpp cannot construct iterator elements outside of range(0,9)");
+        }
+    }
+    num = std::deque<int>{begin, end};
+}
+
+
+
+/**
  * @brief Overloaded UBigInt insertion operator prints sign and value of UBigInt
  * @param out Output stream reference
  * @param rhs Subject UBigInt refence to stream
@@ -114,7 +156,7 @@ inline std::ostream& operator<<(std::ostream& out, const UBigInt rhs) {
 }
 
 
-/** 
+/**
  * @brief Overloaded UBigInt equal to comparison operator 
  * @param lhs UBigInt reference lhs of comparison
  * @param rhs UBigInt reference rhs of comparison
@@ -125,7 +167,7 @@ inline bool operator==(const UBigInt &lhs, const UBigInt &rhs) {
 }
 
 
-/** 
+/**
  * @brief Overloaded UBigInt less than comparison operator. Compares number of digits then if number(digits) equal, compares the content of digits.
  * @param lhs UBigInt reference lhs of comparison
  * @param rhs UBigInt reference rhs of comparison
@@ -145,7 +187,7 @@ inline bool operator<(const UBigInt &lhs, const UBigInt &rhs) {
 }
 
 
-/** 
+/**
  * @brief Overloaded UBigInt greater than comparison operator. Compares number of digits then if number(digits) equal, compares the content of digits.
  * @param lhs UBigInt reference lhs of comparison
  * @param rhs UBigInt reference rhs of comparison
@@ -165,7 +207,7 @@ inline bool operator>(const UBigInt &lhs, const UBigInt &rhs) {
 }
 
 
-/** 
+/**
  * @brief Overloaded UBigInt less than or equal to operator.
  * @param lhs UBigInt reference lhs of comparison
  * @param rhs UBigInt reference rhs of comparison
@@ -176,7 +218,7 @@ inline bool operator<=(const UBigInt &lhs, const UBigInt &rhs) {
 }
 
 
-/** 
+/**
  * @brief Overloaded UBigInt greater than or equal to operator.
  * @param lhs UBigInt reference lhs of comparison
  * @param rhs UBigInt reference rhs of comparison
@@ -187,7 +229,7 @@ inline bool operator>=(const UBigInt &lhs, const UBigInt &rhs) {
 }
 
 
-/** 
+/**
  * @brief Overloaded UBigInt not-equal to comparison operator 
  * @param lhs BigInt reference lhs of comparison
  * @param rhs BigInt reference rhs of comparison
@@ -198,7 +240,7 @@ inline bool operator!=(const UBigInt &lhs, const UBigInt &rhs) {
 }
 
 
-/** 
+/**
  * @brief Overloaded UBigInt addition assignment operator and core addition algorithm
  * @param rhs UBigInt reference added to *this
  * @returns Reference to modified instance 
@@ -226,7 +268,7 @@ inline UBigInt& UBigInt::operator+=(const UBigInt &rhs) {
 }
 
 
-/** 
+/**
  * @brief Overloaded UBigInt subtraction assignment operator and core subtraction algorithm
  * @param rhs UBigInt reference *this is subtracted by
  * @returns Reference to modified instance 
@@ -249,7 +291,13 @@ inline UBigInt& UBigInt::operator-=(const UBigInt &rhs) {
             num[num.size()-i-1] = column_diff < 0 ? (column_diff+10) : column_diff;
             borrow = (column_diff < 0);
         }
-        if (num.front() == 0) {
+        /*
+            285119577441
+           -275452342542
+            ______________
+            009667234899 <-- can have multiple stray leading zeros in long subtraction
+        */
+        while (num.front() == 0) {
             num.pop_front();
         }
     }
@@ -257,18 +305,18 @@ inline UBigInt& UBigInt::operator-=(const UBigInt &rhs) {
 }
 
 
-/** 
+/**
  * @brief Overloaded UBigInt multplication assignment operator
  * @param rhs UBigInt reference multplied by *this
  * @returns Reference to modified instance 
  */
 inline UBigInt& UBigInt::operator*=(const UBigInt &rhs) {
-    *this = elementary_mult(*this, rhs);
+    *this = long_multiplication(*this, rhs);
     return *this;
 }
 
 
-/** 
+/**
  * @brief Overloaded UBigInt division assignment operator
  * @param rhs UBigInt reference *this is divided by
  * @returns Reference to modified instance 
@@ -279,7 +327,7 @@ inline UBigInt& UBigInt::operator/=(const UBigInt &rhs) {
 }
 
 
-/** 
+/**
  * @brief Overloaded BigInt postfix increment operator 
  * @returns Reference to modified instance 
  */
@@ -289,7 +337,7 @@ inline UBigInt& UBigInt::operator++() {
 }
 
 
-/** 
+/**
  * @brief Overloaded BigInt postfix decrement operator 
  * @returns Reference to modified instance 
  */
@@ -299,7 +347,7 @@ inline UBigInt& UBigInt::operator--() {
 }
 
 
-/** 
+/**
  * @brief Overloaded BigInt prefix increment operator 
  * @param _ Placeholder integer argument
  * @returns Copy of new instance 
@@ -311,7 +359,7 @@ inline UBigInt UBigInt::operator++(int) {
 }
 
 
-/** 
+/**
  * @brief Overloaded BigInt prefix decrement operator 
  * @param _ Placeholder integer argument
  * @returns Copy of new instance 
@@ -323,7 +371,7 @@ inline UBigInt UBigInt::operator--(int) {
 }
 
 
-/** 
+/**
  * @brief Overloaded UBigInt binary addition operator 
  * @param lhs UBigInt reference lhs component of sum
  * @param rhs UBigInt reference rhs component of sum
@@ -334,7 +382,7 @@ inline UBigInt operator+(const UBigInt &lhs, const UBigInt &rhs) {
 }
 
 
-/** 
+/**
  * @brief Overloaded UBigInt binary subtraction operator 
  * @param lhs UBigInt reference lhs component of difference
  * @param rhs UBigInt reference rhs component of difference
@@ -345,7 +393,7 @@ inline UBigInt operator-(const UBigInt &lhs, const UBigInt &rhs) {
 } 
 
 
-/** 
+/**
  * @brief Overloaded UBigInt binary multiplication operator 
  * @param lhs UBigInt reference lhs component of product
  * @param rhs UBigInt reference rhs component of product
@@ -356,7 +404,7 @@ inline UBigInt operator*(const UBigInt &lhs, const UBigInt &rhs) {
 }
 
 
-/** 
+/**
  * @brief Overloaded UBigInt binary division operator 
  * @param lhs UBigInt reference lhs (numerator) component of product
  * @param rhs UBigInt reference rhs (denominator) component of product
@@ -367,13 +415,13 @@ inline UBigInt operator/(const UBigInt &lhs, const UBigInt &rhs) {
 }
 
 
-/** 
- * @brief Utility method which implements core elementary multiplication algorithm
+/**
+ * @brief Utility method which implements core long multiplication algorithm
  * @param lhs Left hand portion of multiplication algorithm
  * @param rhs Right hand portion of multiplication algorithm
  * @returns Copy of product instance
  */
-inline UBigInt UBigInt::elementary_mult(const UBigInt &lhs, const UBigInt &rhs) {
+inline UBigInt UBigInt::long_multiplication(const UBigInt &lhs, const UBigInt &rhs) {
     if (lhs == 0 || rhs == 0) {
         return 0;
     }
@@ -407,7 +455,7 @@ inline UBigInt UBigInt::elementary_mult(const UBigInt &lhs, const UBigInt &rhs) 
 }
 
 
-/** 
+/**
  * @brief Utility primitive integer division algorithm which counts how many rhs in *this
  * @param rhs Divisor of division method
  * @returns Copy of quotient instance 
@@ -423,7 +471,7 @@ inline UBigInt UBigInt::divide_primative(const UBigInt &rhs) {
 }
 
 
-/** 
+/**
  * @brief Utility method which implements core long division algorithm
  * @param rhs Divisor of division algo
  * @returns Copy of quotient instance
@@ -459,7 +507,7 @@ inline UBigInt UBigInt::long_division(const UBigInt &rhs) {
     }
 }
 
-/** 
+/**
  * @brief  Randomizes UBigInt instance sign and magnitude to specified number of digits
  * @param length Specified number of digits
  * @returns Reference to modified UBigInt
@@ -473,7 +521,7 @@ inline UBigInt& UBigInt::randomize(const size_t &length) {
 }
 
 
-/** 
+/**
  * @brief  Utility method to extract slice of BigInt from a start to end index
  * @param  start_index Index of the beginning of the chunk to extract.
  * @param  end_index Index of the end of the chunk to extract.
@@ -487,7 +535,7 @@ inline UBigInt UBigInt::get_slice(size_t start_index, size_t end_index) {
 }
 
 
-/** 
+/**
  * @brief  UBigInt's primitive exponent utility method
  * @param rhs Exponent to raise base *this by
  * @returns Reference to modified UBigInt
@@ -508,7 +556,7 @@ inline UBigInt& UBigInt::power(const UBigInt &rhs) {
 }
 
 
-/** 
+/**
  * @brief  UBigInt's base-10 shift utility method; resizes if necessary
  * @param m Number of places to shift forward or back
  * @returns Reference to modified UBigInt

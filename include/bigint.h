@@ -7,7 +7,7 @@
 
 #include "ubigint.h"
 
-/** 
+/**
  * @brief Signed arbitrarily "big" precision integer class.
  * Uses std::deque<int> for dynamic storage. Stores magnitude by composition in unsigned UBigInt member.
  */
@@ -15,67 +15,43 @@
 class BigInt {
 public:
     BigInt() = default;
-    BigInt(char rhs, bool negative=0): magnitude{rhs}, neg{negative} {}
-    BigInt(std::string s) {
-        neg = false;
-        int i = 0;
-        while (s[i] == ' ') {
-            i++;
-        }
-        if (s[i] == '-' || s[i] == '+') {
-            if (s[i] == '-') {
-                neg = true;
-            }
-            i++;
-        }
-        magnitude = s.substr(i, s.size());
-        if (magnitude == 0) {
-            neg = false;
-        }
-    }
-    BigInt(UBigInt rhs, bool negative=0) : magnitude{rhs}, neg{negative} {}
-    template <class T,
-              typename std::enable_if<std::is_integral<T>::value, int>::type* = nullptr>
-    BigInt(T rhs): magnitude{rhs} {
-        if (rhs < 0) {
-            neg = true;
-        }
-        else {
-            neg = false;
-        }
-    }
-    template <typename Iter>
-    BigInt(Iter begin, Iter end, bool negative=0) : magnitude{begin, end},
-                                                    neg{negative} {}
     BigInt(const BigInt &rhs) = default;
     BigInt(BigInt &&rhs) = default;
-    inline  ~BigInt() = default;
-    inline  BigInt& operator=(const BigInt &rhs) = default;
-    inline  BigInt& operator=(BigInt &&rhs) = default;
-    inline  BigInt& operator+=(const BigInt &rhs);
-    inline  BigInt& operator-=(const BigInt &rhs);
-    inline  BigInt& operator*=(const BigInt &rhs);
-    inline  BigInt operator/=(const BigInt &rhs);
-    inline  BigInt& operator++();
-    inline  BigInt& operator--();
-    inline  BigInt operator++(int);
-    inline  BigInt operator--(int);
-    inline  friend BigInt operator+(const BigInt &lhs, const BigInt &rhs);
-    inline  friend BigInt operator-(const BigInt &lhs, const BigInt &rhs);
-    inline  friend BigInt operator*(const BigInt &lhs, const BigInt &rhs);
-    inline  friend BigInt operator/(const BigInt &lhs, const BigInt &rhs);
-    inline  friend bool operator>(const BigInt &lhs, const BigInt &rhs);
-    inline  friend bool operator<(const BigInt &lhs, const BigInt &rhs);
-    inline  friend bool operator==(const BigInt &lhs, const BigInt &rhs);
-    inline  friend bool operator!=(const BigInt &lhs, const BigInt &rhs);
-    inline  friend bool operator>=(const BigInt &lhs, const BigInt &rhs);
-    inline  friend bool operator<=(const BigInt &lhs, const BigInt &rhs);
-    inline  friend std::ostream& operator<<(std::ostream &out, const BigInt &rhs);
-    inline  BigInt& randomize(const size_t &length);
-    inline  BigInt& power(const BigInt &rhs);
-    inline  BigInt& shift10(int m=1);
-    inline  BigInt& abs();
-    inline  BigInt& set_karatsuba_thres(size_t thres); 
+    inline BigInt(char rhs, bool negative=0);
+    inline BigInt(std::string s);
+    inline BigInt(UBigInt rhs, bool negative=0);
+    template <class T,
+                typename std::enable_if<std::is_integral<T>::value, int>::type* = nullptr>
+    inline BigInt(T rhs);
+    template <typename Iter>
+    inline BigInt(Iter begin, Iter end, bool negative=0);
+    inline ~BigInt() = default;
+    inline BigInt& operator=(const BigInt &rhs) = default;
+    inline BigInt& operator=(BigInt &&rhs) = default;
+    inline BigInt& operator+=(const BigInt &rhs);
+    inline BigInt& operator-=(const BigInt &rhs);
+    inline BigInt& operator*=(const BigInt &rhs);
+    inline BigInt operator/=(const BigInt &rhs);
+    inline BigInt& operator++();
+    inline BigInt& operator--();
+    inline BigInt operator++(int);
+    inline BigInt operator--(int);
+    inline friend BigInt operator+(const BigInt &lhs, const BigInt &rhs);
+    inline friend BigInt operator-(const BigInt &lhs, const BigInt &rhs);
+    inline friend BigInt operator*(const BigInt &lhs, const BigInt &rhs);
+    inline friend BigInt operator/(const BigInt &lhs, const BigInt &rhs);
+    inline friend bool operator>(const BigInt &lhs, const BigInt &rhs);
+    inline friend bool operator<(const BigInt &lhs, const BigInt &rhs);
+    inline friend bool operator==(const BigInt &lhs, const BigInt &rhs);
+    inline friend bool operator!=(const BigInt &lhs, const BigInt &rhs);
+    inline friend bool operator>=(const BigInt &lhs, const BigInt &rhs);
+    inline friend bool operator<=(const BigInt &lhs, const BigInt &rhs);
+    inline friend std::ostream& operator<<(std::ostream &out, const BigInt &rhs);
+    inline BigInt& randomize(const size_t &length);
+    inline BigInt& power(const BigInt &rhs);
+    inline BigInt& shift10(int m=1);
+    inline BigInt& abs();
+    inline BigInt& set_karatsuba_thres(size_t thres);
     size_t get_length() {return magnitude.get_length();}
     size_t get_karatsuba_thres() {return this->karatsuba_thres;}
 private:
@@ -86,8 +62,70 @@ private:
 };
 
 
+/**
+ * @brief BigInt single char ctor
+ * @param rhs character to place into magnitude
+ * @param negative negative sign (Default=0)
+ */
+inline BigInt::BigInt(char rhs, bool negative): magnitude{rhs}, neg{negative} {}
 
-/** 
+
+/**
+ * @brief BigInt std::string ctor
+ * @param s std::string to parse into magnitude
+ */
+inline BigInt::BigInt(std::string s) {
+    neg = false;
+    int i = 0;
+    while (s[i] == ' ') {
+        i++;
+    }
+    if (s[i] == '-' || s[i] == '+') {
+        if (s[i] == '-') {
+            neg = true;
+        }
+        i++;
+    }
+    magnitude = s.substr(i, s.size());
+    if (magnitude == 0) {
+        neg = false;
+    }
+}
+
+
+/**
+ * @brief BigInt unsigned conversion ctor
+ * @param rhs UBigInt to construct
+ * @param negative negative sign (Default=0)
+ */
+inline BigInt::BigInt(UBigInt rhs, bool negative) : magnitude{rhs}, neg{negative} {}
+
+
+/**
+ * @brief BigInt generic integral ctor
+ * @param rhs integral value to place in magnitude
+ */
+template <class T,
+            typename std::enable_if<std::is_integral<T>::value, int>::type*>
+inline BigInt::BigInt(T rhs): magnitude{rhs} {
+    if (rhs < 0) {
+        neg = true;
+    }
+    else {
+        neg = false;
+    }
+}
+
+/**
+ * @brief BigInt generic iterator ctor
+ * @param begin beginning iterator of range to copy
+ * @param end end iterator of range to copy
+ * @param negative negative sign (Default=0)
+ */
+template <typename Iter>
+inline BigInt::BigInt(Iter begin, Iter end, bool negative) : magnitude{begin, end}, neg{negative} {}
+
+/**
  * @brief Overloaded BigInt insertion operator prints sign and value of BigInt
  * @param out Output stream reference
  * @param rhs Subject BigInt refence to stream
@@ -102,7 +140,7 @@ inline std::ostream& operator<<(std::ostream &out, const BigInt &rhs) {
 }
 
 
-/** 
+/**
  * @brief Overloaded BigInt addition assignment operator 
  * @param rhs BigInt reference added to *this
  * @returns Reference to modified instance 
@@ -149,7 +187,7 @@ inline BigInt& BigInt::operator+=(const BigInt &rhs) {
 }
 
 
-/** 
+/**
  * @brief Overloaded BigInt subtraction assignment operator 
  * @param rhs BigInt reference subtracted from *this
  * @returns Reference to modified instance 
@@ -195,7 +233,7 @@ inline BigInt& BigInt::operator-=(const BigInt &rhs) {
 }
 
 
-/** 
+/**
  * @brief Overloaded BigInt multiplication assignment operator 
  * @param rhs BigInt reference multiplied by *this
  * @returns Reference to modified instance 
@@ -208,7 +246,7 @@ inline BigInt& BigInt::operator*=(const BigInt &rhs) {
 }
 
 
-/** 
+/**
  * @brief Overloaded BigInt division assignment operator 
  * @param rhs BigInt reference *this is divided by
  * @returns Reference to modified instance 
@@ -226,7 +264,7 @@ inline BigInt BigInt:: operator/=(const BigInt &rhs) {
 }
 
 
-/** 
+/**
  * @brief Overloaded BigInt postfix increment operator 
  * @returns Reference to modified instance 
  */
@@ -236,7 +274,7 @@ inline BigInt& BigInt::operator++() {
 }
 
 
-/** 
+/**
  * @brief Overloaded BigInt postfix decrement operator 
  * @returns Reference to modified instance 
  */
@@ -245,7 +283,7 @@ inline BigInt& BigInt::operator--() {
     return *this;
 }
 
-/** 
+/**
  * @brief Overloaded BigInt prefix increment operator 
  * @param _ Placeholder integer argument
  * @returns Copy of new instance 
@@ -257,7 +295,7 @@ inline BigInt BigInt::operator++(int) {
 }
 
 
-/** 
+/**
  * @brief Overloaded BigInt prefix decrement operator 
  * @param _ Placeholder integer argument
  * @returns Copy of new instance 
@@ -269,7 +307,7 @@ inline BigInt BigInt::operator--(int) {
 }
 
 
-/** 
+/**
  * @brief Overloaded BigInt binary addition operator 
  * @param lhs BigInt reference lhs component of sum
  * @param rhs BigInt reference rhs component of sum
@@ -280,7 +318,7 @@ inline BigInt operator+(const BigInt &lhs, const BigInt &rhs) {
 }
 
 
-/** 
+/**
  * @brief Overloaded BigInt binary subtraction operator 
  * @param lhs BigInt reference lhs component of difference
  * @param rhs BigInt reference rhs component of difference
@@ -291,7 +329,7 @@ inline BigInt operator-(const BigInt &lhs, const BigInt &rhs) {
 } 
 
 
-/** 
+/**
  * @brief Overloaded BigInt binary multiplication operator 
  * @param lhs BigInt reference lhs component of product
  * @param rhs BigInt reference rhs component of product
@@ -302,7 +340,7 @@ inline BigInt operator*(const BigInt &lhs, const BigInt &rhs) {
 }
 
 
-/** 
+/**
  * @brief Overloaded BigInt binary division operator 
  * @param lhs BigInt reference lhs (numerator) component of product
  * @param rhs BigInt reference rhs (denominator) component of product
@@ -313,7 +351,7 @@ inline BigInt operator/(const BigInt &lhs, const BigInt &rhs) {
 }
 
 
-/** 
+/**
  * @brief Overloaded BigInt greater than comparison operator 
  * @param lhs BigInt reference lhs of comparison
  * @param rhs BigInt reference rhs of comparison
@@ -336,7 +374,7 @@ inline bool operator>(const BigInt &lhs, const BigInt &rhs) {
 }
 
 
-/** 
+/**
  * @brief Overloaded BigInt less than comparison operator 
  * @param lhs BigInt reference lhs of comparison
  * @param rhs BigInt reference rhs of comparison
@@ -358,7 +396,7 @@ inline bool operator<(const BigInt &lhs, const BigInt &rhs) {
 }
 
 
-/** 
+/**
  * @brief Overloaded BigInt equal to comparison operator 
  * @param lhs BigInt reference lhs of comparison
  * @param rhs BigInt reference rhs of comparison
@@ -372,7 +410,7 @@ inline bool operator==(const BigInt &lhs, const BigInt &rhs) {
 }
 
 
-/** 
+/**
  * @brief Overloaded BigInt not-equal to comparison operator 
  * @param lhs BigInt reference lhs of comparison
  * @param rhs BigInt reference rhs of comparison
@@ -383,7 +421,7 @@ inline bool operator!=(const BigInt &lhs, const BigInt &rhs) {
 }
 
 
-/** 
+/**
  * @brief Overloaded BigInt greater than or equal to comparison operator 
  * @param lhs BigInt reference lhs of comparison
  * @param rhs BigInt reference rhs of comparison
@@ -394,7 +432,7 @@ inline bool operator>=(const BigInt &lhs, const BigInt &rhs) {
 }
 
 
-/** 
+/**
  * @brief Overloaded BigInt less than or equal to comparison operator 
  * @param lhs BigInt reference lhs of comparison
  * @param rhs BigInt reference rhs of comparison
@@ -405,8 +443,8 @@ inline bool operator<=(const BigInt &lhs, const BigInt &rhs) {
 }
 
 
-/** 
- * @brief Sets karatsuba_thres which is minimum size(magnitude) that uses karatsuba vs. elementary multiplication
+/**
+ * @brief Sets karatsuba_thres which is minimum size(magnitude) that uses karatsuba vs. long multiplication
  * @param thres Threshold size
  * @returns Reference to adjusted instance
  */
@@ -416,8 +454,8 @@ inline BigInt& BigInt::set_karatsuba_thres(size_t thres) {
 }
 
 
-/** 
- * @brief Karatsuba recursive multiplication algorithm which recurses at size(magnitude) > karatsuba_thres. Base condition calls elementary multiplication
+/**
+ * @brief Karatsuba recursive multiplication algorithm which recurses at size(magnitude) > karatsuba_thres. Base condition calls long multiplication
  * @param lhs Left hand portion of multiplication algorithm
  * @param rhs Right hand portion of multiplication algorithm
  * @returns Copy of BigInt product
@@ -455,7 +493,7 @@ inline BigInt BigInt::karatsuba(BigInt lhs, BigInt rhs) {
 }
 
 
-/** 
+/**
  * @brief  Randomizes BigInt instance sign and magnitude to specified number of digits
  * @param length Specified number of digits
  * @returns Reference to modified BigInt
@@ -467,7 +505,7 @@ inline BigInt& BigInt::randomize(const size_t &length) {
 }
 
 
-/** 
+/**
  * @brief  BigInt's exponent utility method
  * @param rhs Exponent to raise base *this by
  * @returns Reference to modified BigInt
@@ -491,7 +529,7 @@ inline BigInt& BigInt::power(const BigInt &rhs) {
 }
 
 
-/** 
+/**
  * @brief  BigInt's absolute value utility method
  * @returns Reference to modified BigInt
  */
@@ -501,7 +539,7 @@ inline BigInt& BigInt::abs() {
 }
 
 
-/** 
+/**
  * @brief  BigInt's base-10 shift utility method, calls member magnitudes (UBigInt) shift method
  * @param m Number of places to shift forward or back
  * @returns Reference to modified BigInt
