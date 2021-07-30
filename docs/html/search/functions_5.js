@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['set_5fkaratsuba_5fthres_37',['set_karatsuba_thres',['../classBigInt.html#ab5913ed1db21a9733aa07f6ea6b49ca9',1,'BigInt']]],
-  ['shift10_38',['shift10',['../classBigInt.html#adbf4bcc15490753b40c8f6079c45ff74',1,'BigInt::shift10()'],['../classUBigInt.html#acf20a9b6d0a3e3048daf476a6680440d',1,'UBigInt::shift10()']]]
+  ['randomize_37',['randomize',['../classBigInt.html#ac7aa2fb7fb429858de9bf178b13bb89f',1,'BigInt::randomize()'],['../classUBigInt.html#a1f101aad3d139b317adc853a3fbf6ae0',1,'UBigInt::randomize()']]]
 ];
