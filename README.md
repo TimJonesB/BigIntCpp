@@ -14,7 +14,7 @@ Possible future optimizations for BigIntCpp:
 - Divide and conquer division optimization
 - Base power of 2 (currently using base-10)
 - Optimizing implementation of underlying container (currently std::deque simply for easy/fast implementation)
-  - Most notibly minimizing inserts/shifts
+  - Most notably minimizing inserts/shifts
   - Possibly changing container type
 
 As mentioned, lots of optimization opportunities for division/multiplication:
