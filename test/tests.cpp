@@ -1,9 +1,11 @@
 #include <gtest/gtest.h>
+#include "bigint.h"
+#include <chrono>
 
-/**
- * @brief  Entry point for module which runs all available gtests on BigIntCpp header only library.
- */
+
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
+
     return RUN_ALL_TESTS();
+    return 0;
 }

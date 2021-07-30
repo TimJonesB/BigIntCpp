@@ -6,7 +6,7 @@
 
 /**
  * @brief Unit test (gtest) for division arithmatic. Always returns "PASS" but informs user if they should change the threshold from default.
- * The karatsuba threshold is the minimum length (in digits) that use karatsuba recursive multiplication algorithm vs elementary multiplication (base-case) for recursion.
+ * The karatsuba threshold is the minimum length (in digits) that use karatsuba recursive multiplication algorithm vs long multiplication (base-case) for recursion.
  */
 TEST (karatsuba, karatsuba_calibration) {
 	std::pair<int, int> k_test_limits= {16,128};
